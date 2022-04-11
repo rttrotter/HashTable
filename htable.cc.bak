@@ -1,0 +1,103 @@
+#include "htable.h"
+
+#define N1 10  // num of decimal digits
+#define N2 26  // num of upper-case letters
+
+// Hash function, you may NOT modify this function
+int HT::hash(const string &s) {
+  int n = (N2 * N1) * (s[0] - 'A') + N1 * (s[1] - 'A') + (s[2] - '0');
+
+  return n % hsize;
+}
+
+// You will complete the code below ...
+
+bool mySort(Entry *i, Entry *j)
+{
+	return(i->key < j->key);
+};
+
+HT::HT(const unsigned &hs)
+{
+	hsize = hs;
+	hTable.resize(hs);
+}
+
+HT::~HT() 
+{
+	while(hTable.size() != 0)
+	{
+		while(hTable.back().size() != 0)
+			hTable.back().pop_back();
+		hTable.pop_back();
+	}
+	while(pTable.size() != 0)
+	{
+		pTable.pop_back();
+	}
+}
+
+void HT::insert(const Entry &e) 
+{
+	int h = hash(e.key);
+	bool found = false;
+	for(Entry data : hTable[h])
+	{
+		if(e.key == data.key)
+		{
+			cout << " Error: Entry exists" << endl;
+			found = true;
+			break;
+		}
+	}
+	if(!found)
+	{
+		cout << " Hash Index: " << h << endl;
+		hTable[h].push_front(e); // add Entry to our hash table
+		pTable.push_back(&(hTable[h].back())); // add our pointer that points to entry. 
+		
+	}
+	
+}
+
+void HT::search(const string &s) 
+{
+	int h = hash(s);
+	bool error = true;
+	for(Entry e : hTable[h])
+	{
+		if(e.key == s)
+		{
+			cout << " Found: key: " << e.key << "num: " << e.num << ", desc: " << e.desc << endl;
+			error = false;
+		}
+	}
+	if(error)
+	{
+		cout << " Error, no entry found" << endl;
+	}
+	
+}
+
+void HT::hTable_print() 
+{
+	for(list<Entry> l : hTable)
+	{
+		for(Entry e : l)
+		{
+			cout << e.key << ", " << e.num << ", " << e.desc << endl;
+			
+		}
+	}
+}
+
+
+void HT::pTable_print() 
+{
+	sort(pTable.begin(), pTable.end(), mySort);
+	for(Entry *e : pTable)
+	{
+			cout << e->key << ", " << e->desc << ", " << e->num << endl;
+	}
+}
+
